@@ -145,25 +145,39 @@ export const viewPortfolio = catchAsync(async (req, res, next) => {
   const portfolio = await Portfolio.findOne({
     shareToken: token,
     isPublic: true,
-  }).populate("learnerId");
+  }).populate({
+    path: "learnerId",
+    select: "firstName lastName bio skills education linkedInUrl portfolioUrl",
+  });
 
   if (!portfolio) {
     return next(new AppError("Portfolio not found or not public", 404));
   }
 
-  // Get learner details
-  const learner = await Learner.findById(portfolio.learnerId);
+  // Use populated learner when available, otherwise fetch by id
+  let learner = portfolio.learnerId;
+  const learnerId = learner && learner._id ? learner._id : portfolio.learnerId;
+  console.log("Viewing portfolio for learner ID:", learnerId);
+  if (!learner) {
+    learner = await Learner.findById(learnerId);
+  }
+
+  if (!learner) {
+    return next(
+      new AppError("Learner associated with this portfolio not found", 404),
+    );
+  }
 
   // Get credentials
   const credentials = await Credential.find({
-    learnerId: portfolio.learnerId,
+    learnerId: learnerId,
     verificationStatus: "verified",
     isPublic: true,
   }).populate("institutionId", "name type");
 
   // Get achievements
   const achievements = await Achievement.find({
-    learnerId: portfolio.learnerId,
+    learnerId: learnerId,
     isPublic: true,
   });
 
