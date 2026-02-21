@@ -12,6 +12,12 @@ router.use(protect);
 router.use(restrictTo("learner"));
 
 // Profile routes
+// Main dashboard route
+router.get("/dashboard", learnerController.getDashboard);
+
+// Get all details related to learner profile
+router.get("/profile/all", learnerController.getAllProfileDetails);
+
 router.get("/profile", learnerController.getProfile);
 router.put(
   "/profile",
@@ -45,6 +51,7 @@ router.get("/analytics/views", portfolioController.getPortfolioAnalytics);
 // Achievement routes
 router.post("/achievements", achievementController.addAchievement);
 router.get("/achievements", achievementController.getAchievements);
+router.get("/achievements/:id", achievementController.getAchievementById);
 router.put("/achievements/:id", achievementController.updateAchievement);
 router.delete("/achievements/:id", achievementController.deleteAchievement);
 

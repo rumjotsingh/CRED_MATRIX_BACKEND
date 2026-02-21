@@ -10,66 +10,66 @@ This file provides a detailed API reference, including endpoint descriptions, re
 ## Quick start
 
 ```bash
-npm install
-npm start
-```
+# Learner API - README
 
-Create `.env` from `.env.example` and configure MongoDB and Cloudinary credentials.
+This README provides an overview of the Learner API endpoints, authentication, and usage instructions.
+
+## Overview
+The Learner API allows authenticated users with the `learner` role to manage their profile, education, skills, credentials, portfolio, and achievements. All endpoints are protected and require a valid JWT token.
 
 ## Authentication
+- All requests must include an `Authorization: Bearer <token>` header.
+- Only users with the `learner` role can access these endpoints.
 
-### Login
-- **Endpoint:** `POST /api/v1/auth/login`
-- **Description:** Authenticates a user and returns a JWT token.
-- **Request Body:**
-	```json
-	{
-		"email": "user@example.com",
-		"password": "secret"
-	}
-	```
-- **Response Body:**
-	```json
-	{
-		"success": true,
-		"token": "<JWT>",
-		"data": {
-			"user": 	{
-				"id": "...",
-				"role": "learner"
-			}
-		}
-	}
-	```
+## Endpoints Summary
+| Method | Endpoint                   | Description                        |
+|--------|----------------------------|------------------------------------|
+| GET    | /profile                   | Get learner profile                |
+| PUT    | /profile                   | Update learner profile             |
+| POST   | /education                 | Add education                      |
+| POST   | /skills                    | Add skill                          |
+| GET    | /credentials               | Get credentials                    |
+| GET    | /career-recommendations    | Get career recommendations         |
+| POST   | /skill-gap                 | Skill gap analysis                 |
+| DELETE | /profile                   | Delete account                     |
+| POST   | /portfolio/create          | Create portfolio                   |
+| POST   | /portfolio/share           | Share portfolio                    |
+| GET    | /portfolio                 | Get my portfolio                   |
+| POST   | /portfolio/unshare         | Unshare portfolio                  |
+| DELETE | /portfolio                 | Delete portfolio                   |
+| GET    | /analytics/views           | Portfolio analytics                |
+| POST   | /achievements              | Add achievement                    |
+| GET    | /achievements              | Get achievements                   |
+| PUT    | /achievements/:id          | Update achievement                 |
+| DELETE | /achievements/:id          | Delete achievement                 |
 
-### Register
-- **Endpoint:** `POST /api/v1/auth/register`
-- **Description:** Registers a new user (learner, employer, or institution).
-- **Request Body:** (Fields depend on user type, but typically includes name, email, password, and role.)
-- **Response Body:** Similar to login, with user data and token.
+## Request & Response Details
+- All requests and responses use JSON format.
+- See [`docs/learner-api.md`](docs/learner-api.md) for detailed request/response examples and schemas, including required fields and sample payloads.
+
+## Error Handling
+- Standard HTTP status codes are used.
+- Error responses are in JSON with an `error` message.
+
+## Example Usage
+```
+GET /profile
+Headers: Authorization: Bearer <token>
+Response: 200 OK
+{
+	"name": "John Doe",
+	"email": "john@example.com",
+	...
+}
+```
+
+## Further Reference
+- See `controllers/learnerController.js` for business logic.
+- See `middleware/validation.js` for validation schemas.
 
 ---
 
-## Institutions
-
-### List Institutions
-- **Endpoint:** `GET /api/v1/institutions`
-- **Description:** Returns a list of all institutions.
-- **Request Body:** None
-- **Response Body:** List of institution objects.
-
-### Get Institution
-- **Endpoint:** `GET /api/v1/institutions/:id`
-- **Description:** Returns details of a specific institution.
-- **Request Body:** None
-- **Response Body:** Institution object.
-
-### Create Institution
-- **Endpoint:** `POST /api/v1/institutions` (admin)
-- **Description:** Creates a new institution.
-- **Request Body:** Institution details (name, email, etc.)
-- **Response Body:** Created institution object.
-
+For questions or issues, contact the backend team.
 ### Update Institution
 - **Endpoint:** `PUT /api/v1/institutions/:id` (institution, admin)
 - **Description:** Updates institution details.

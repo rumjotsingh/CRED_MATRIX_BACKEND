@@ -1,3 +1,62 @@
+/**
+ * @desc    Get main learner dashboard (aggregated summary)
+ * @route   GET /api/v1/learners/dashboard
+ * @access  Private (Learner)
+ */
+export const getDashboard = catchAsync(async (req, res, next) => {
+  const learner = await Learner.findById(req.user.id);
+  if (!learner) {
+    return next(new AppError("Learner not found", 404));
+  }
+
+  // Fetch portfolio, credentials, achievements
+  const [portfolio, credentials, achievements] = await Promise.all([
+    Portfolio.findOne({ learnerId: req.user.id }),
+    Credential.find({ learnerId: req.user.id }),
+    Achievement.find({ learnerId: req.user.id }),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      learner,
+      portfolio,
+      credentials,
+      achievements,
+    },
+  });
+});
+
+/**
+ * @desc    Get all details related to learner profile
+ * @route   GET /api/v1/learners/profile/all
+ * @access  Private (Learner)
+ */
+export const getAllProfileDetails = catchAsync(async (req, res, next) => {
+  const learner = await Learner.findById(req.user.id);
+  if (!learner) {
+    return next(new AppError("Learner not found", 404));
+  }
+
+  // Fetch credentials, achievements, portfolio, education, skills
+  const [credentials, achievements, portfolio] = await Promise.all([
+    Credential.find({ learnerId: req.user.id }),
+    Achievement.find({ learnerId: req.user.id }),
+    Portfolio.findOne({ learnerId: req.user.id }),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      profile: learner,
+      credentials,
+      achievements,
+      portfolio,
+      education: learner.education,
+      skills: learner.skills,
+    },
+  });
+});
 import Learner from "../models/Learner.js";
 import Credential from "../models/Credential.js";
 import AppError from "../utils/appError.js";
