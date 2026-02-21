@@ -222,6 +222,7 @@ export const inviteLearner = catchAsync(async (req, res, next) => {
   const { jobId, message } = req.body;
 
   const job = await Job.findOne({ _id: jobId, employerId: req.user.id });
+  // console.log("Inviting learner", learnerId, "to job", jobId);
 
   if (!job) {
     return next(new AppError("Job not found", 404));
@@ -401,7 +402,7 @@ export const removeFromTalentPool = catchAsync(async (req, res, next) => {
 
   const before = talentPool.learners.length;
   talentPool.learners = talentPool.learners.filter(
-    (l) => l.learnerId.toString() !== learnerId,
+    (l) => l.learnerId !== learnerId,
   );
 
   if (talentPool.learners.length === before) {
