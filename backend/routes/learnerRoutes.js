@@ -1,7 +1,7 @@
 import express from "express";
-import * as learnerController from "../controllers/learnerController.js";
 import * as portfolioController from "../controllers/portfolioController.js";
 import * as achievementController from "../controllers/achievementController.js";
+import * as learnerController from "../controllers/learnerController.js";
 import { protect, restrictTo } from "../middleware/auth.js";
 import { validate, schemas } from "../middleware/validation.js";
 
@@ -27,7 +27,9 @@ router.put(
 
 // Education and skills
 router.post("/education", learnerController.addEducation);
+router.delete("/education/:id", learnerController.deleteEducation);
 router.post("/skills", learnerController.addSkill);
+router.delete("/skills/:id", learnerController.deleteSkill);
 
 // Credentials
 router.get("/credentials", learnerController.getCredentials);

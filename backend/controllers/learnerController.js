@@ -57,6 +57,46 @@ export const getAllProfileDetails = catchAsync(async (req, res, next) => {
     },
   });
 });
+export const deleteEducation = catchAsync(async (req, res, next) => {
+  const learner = await Learner.findById(req.user.id);
+  if (!learner) {
+    return next(new AppError("Learner not found", 404));
+  }
+
+  const educationIndex = learner.education.findIndex(
+    (edu) => edu._id.toString() === req.params.id,
+  );
+  if (educationIndex === -1) {
+    return next(new AppError("Education not found", 404));
+  }
+  learner.education.splice(educationIndex, 1);
+  await learner.save();
+
+  res.status(200).json({
+    success: true,
+    data: learner,
+  });
+});
+export const deleteSkill = catchAsync(async (req, res, next) => {
+  const learner = await Learner.findById(req.user.id);
+  if (!learner) {
+    return next(new AppError("Learner not found", 404));
+  }
+
+  const skillIndex = learner.skills.findIndex(
+    (skill) => skill._id.toString() === req.params.id,
+  );
+  if (skillIndex === -1) {
+    return next(new AppError("Skill not found", 404));
+  }
+  learner.skills.splice(skillIndex, 1);
+  await learner.save();
+
+  res.status(200).json({
+    success: true,
+    data: learner,
+  });
+});
 import Learner from "../models/Learner.js";
 import Credential from "../models/Credential.js";
 import AppError from "../utils/appError.js";
@@ -66,6 +106,7 @@ import Portfolio from "../models/Portfolio.js";
 import Achievement from "../models/Achievement.js";
 import User from "../models/User.js";
 import { cloudinary } from "../config/cloudinary.js";
+import e from "express";
 
 /**
  * @desc    Get learner profile
@@ -200,13 +241,26 @@ export const getSkillGapAnalysis = catchAsync(async (req, res, next) => {
  * @access  Private (Learner)
  */
 export const getCredentials = catchAsync(async (req, res, next) => {
-  const credentials = await Credential.find({ learnerId: req.user.id })
-    .populate("institutionId", "name type")
-    .sort("-issueDate");
+  // Pagination
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const skip = (page - 1) * limit;
+
+  const [credentials, total] = await Promise.all([
+    Credential.find({ learnerId: req.user.id })
+      .populate("institutionId", "name type")
+      .sort("-issueDate")
+      .skip(skip)
+      .limit(limit),
+    Credential.countDocuments({ learnerId: req.user.id }),
+  ]);
 
   res.status(200).json({
     success: true,
     count: credentials.length,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
     data: credentials,
   });
 });
